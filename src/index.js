@@ -1,4 +1,5 @@
 import { program } from "commander";
+import { listContacts, getContactById, removeContact, addContact } from "./contacts.js";
 program
   .option("-a, --action <type>", "choose action")
   .option("-i, --id <type>", "user id")
@@ -14,19 +15,43 @@ const options = program.opts();
 async function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
     case "list":
-      // ...
+      const contacts = await listContacts();
+      console.table(contacts);
       break;
 
     case "get":
-      // ... id
+      if (!id) {
+        console.warn("\x1B[31m Id must be provided!");
+        break;
+      }
+      const contact = await getContactById(id);
+      if (!contact) {
+        console.warn("\x1B[31m Contact not found!");
+        break;
+      }
+      console.log(contact);
       break;
 
     case "add":
-      // ... name email phone
+      if (!name || !email || !phone) {
+        console.warn("\x1B[31m Name, email, and phone must be provided!");
+        break;
+      }
+      const newContact = await addContact(name, email, phone);
+      console.log("Contact added:", newContact);
       break;
 
     case "remove":
-      // ... id
+      if (!id) {
+        console.warn("\x1B[31m Id must be provided!");
+        break;
+      }
+      const removedContact = await removeContact(id);
+      if (!removedContact) {
+        console.warn("\x1B[31m Contact not found!");
+        break;
+      }
+      console.log("Contact removed:", removedContact);
       break;
 
     default:
